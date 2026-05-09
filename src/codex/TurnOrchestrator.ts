@@ -279,8 +279,8 @@ export class TurnOrchestrator implements vscode.Disposable {
       const item = notification.params?.item;
       if (isRecord(item) && typeof item.type === "string") {
         this.logLine.fire(`${notification.method}: ${item.type}`);
-        if (item.type === "imageGeneration" && notification.method === "item/completed") {
-          void this.handleImageGenerationItem(item, this.extractTurnId(notification));
+        if (notification.method === "item/completed") {
+          void this.handleGeneratedImagePaths(imageGenerationSavedPaths(item), this.extractTurnId(notification));
         }
         if (item.type === "imageView") {
           void this.selectImageViewItem(item);
@@ -374,16 +374,13 @@ export class TurnOrchestrator implements vscode.Disposable {
     }
   }
 
-  private async handleImageGenerationItem(item: Record<string, unknown>, turnId?: string): Promise<void> {
-    const savedPath = typeof item.savedPath === "string"
-      ? item.savedPath
-      : typeof item.path === "string"
-        ? item.path
-        : undefined;
-    if (!savedPath) {
-      return;
+  private async handleGeneratedImagePaths(savedPaths: string[], turnId?: string): Promise<void> {
+    for (const savedPath of savedPaths) {
+      await this.handleGeneratedImagePath(savedPath, turnId);
     }
+  }
 
+  private async handleGeneratedImagePath(savedPath: string, turnId?: string): Promise<void> {
     const asset = await this.nextPendingAsset(turnId);
     if (!asset) {
       this.logLine.fire(`imageGeneration completed at ${savedPath}, but no pending asset matched this turn.`);
@@ -505,4 +502,50 @@ function createId(prefix: string): string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+function imageGenerationSavedPaths(item: Record<string, unknown>): string[] {
+  const paths = new Set<string>();
+  collectImageGenerationPaths(item, paths);
+  return Array.from(paths);
+}
+
+function collectImageGenerationPaths(value: unknown, paths: Set<string>): void {
+  if (!isRecord(value)) {
+    return;
+  }
+
+  if (value.type === "imageGeneration") {
+    addImageGenerationPath(value, paths);
+  }
+
+  collectImageGenerationPayload(value.imageGeneration, paths);
+  collectImageGenerationPayload(value.imageGenerations, paths);
+}
+
+function collectImageGenerationPayload(value: unknown, paths: Set<string>): void {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectImageGenerationPayload(item, paths);
+    }
+    return;
+  }
+
+  if (!isRecord(value)) {
+    return;
+  }
+
+  addImageGenerationPath(value, paths);
+  collectImageGenerationPaths(value, paths);
+}
+
+function addImageGenerationPath(value: Record<string, unknown>, paths: Set<string>): void {
+  const savedPath = typeof value.savedPath === "string"
+    ? value.savedPath
+    : typeof value.path === "string"
+      ? value.path
+      : undefined;
+  if (savedPath) {
+    paths.add(savedPath);
+  }
 }

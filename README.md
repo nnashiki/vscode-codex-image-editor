@@ -53,6 +53,8 @@ If ChatGPT is not connected yet, run `Codex Image Studio: Log in with ChatGPT` o
 
 ## Codex CLI Resolution
 
+Image generation has been tested with `codex-cli 0.129.0`.
+
 For security, the extension does not read a workspace-controlled `codexCommand` setting and does not execute `codex` from the workspace or arbitrary `PATH` entries. It currently resolves Codex from trusted locations only:
 
 - the bundled Codex binary in the ChatGPT VS Code extension
