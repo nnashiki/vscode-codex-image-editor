@@ -1,0 +1,70 @@
+{
+  "name": "vscode-codex-image-editor",
+  "displayName": "Codex Image Studio",
+  "description": "Generate and iteratively edit images through Codex app-server with ChatGPT managed auth.",
+  "version": "0.0.1",
+  "publisher": "nnashiki",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:codexImageEditor.open",
+    "onCommand:codexImageEditor.login",
+    "onCommand:codexImageEditor.logout",
+    "onCommand:codexImageEditor.refresh",
+    "onCommand:codexImageEditor.interrupt",
+    "onCommand:codexImageEditor.newSession"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codexImageEditor.open",
+        "title": "Codex Image Studio: Open"
+      },
+      {
+        "command": "codexImageEditor.login",
+        "title": "Codex Image Studio: Log in with ChatGPT"
+      },
+      {
+        "command": "codexImageEditor.logout",
+        "title": "Codex Image Studio: Log out"
+      },
+      {
+        "command": "codexImageEditor.refresh",
+        "title": "Codex Image Studio: Refresh"
+      },
+      {
+        "command": "codexImageEditor.interrupt",
+        "title": "Codex Image Studio: Interrupt Current Turn"
+      },
+      {
+        "command": "codexImageEditor.newSession",
+        "title": "Codex Image Studio: New Session"
+      }
+    ],
+    "configuration": {
+      "title": "Codex Image Studio",
+      "properties": {
+        "codexImageEditor.defaultModel": {
+          "type": "string",
+          "default": "gpt-5.4",
+          "description": "Default Codex model to request when starting image editing threads."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/vscode": "^1.96.0",
+    "typescript": "^5.7.2"
+  }
+}

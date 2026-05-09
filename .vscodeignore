@@ -1,0 +1,8 @@
+.vscode/**
+.git/**
+.codex-image-studio/**
+node_modules/**
+src/**
+tsconfig.json
+*.map
+*.vsix
